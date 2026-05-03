@@ -1,0 +1,29 @@
+app = "my-napcat"
+primary_region = "hkg"
+
+[build]
+  image = "."
+
+[env]
+  # ACCOUNT = "你的QQ号"       # 快速登录（可选）
+  # WEBUI_TOKEN = "你的密码"   # WebUI 自定义密码（可选）
+  # MODE = "ws"                # ws / astrbot / koishi（可选）
+
+[http_service]
+  internal_port = 6099
+  force_https = false
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[services.ports]]
+  handlers = ["tls", "http"]
+  port = 3001
+
+[mounts]
+  source = "napcat_data"
+  destination = "/app/napcat/config"
+
+[mounts]
+  source = "qq_data"
+  destination = "/app/.config/QQ"
