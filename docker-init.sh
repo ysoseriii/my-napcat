@@ -1,5 +1,5 @@
 #!/bin/bash
-# init: volume merge + OneBot HTTP setup + cron + test message
+# init: volume merge + OneBot HTTP API + 定时调度 + 测试消息
 set -e
 
 ACCOUNT="${ACCOUNT:-3059754914}"
@@ -21,13 +21,11 @@ ln -sfn /data/QQ /app/.config/QQ
 # 注入 OneBot HTTP API 配置（localhost:3000，免鉴权）
 cp /scripts/onebot-http.json "/data/config/onebot11_${ACCOUNT}.json"
 
-# 设置每日定时
-/scripts/setup-cron.sh
+# 启动后台定时调度器
+bash /scripts/daily-scheduler.sh &
+echo "[init] 定时调度器已启动 (PID $!)"
 
-# 启动 cron
-cron
-
-# 延迟发送测试消息（等 QQ 登录完，~90s）
+# 延迟发送测试消息（等 QQ 登录，~90s）
 (
     sleep 90
     TARGET_QQ=1308357113 /scripts/send-msg.sh "此条为测试消息

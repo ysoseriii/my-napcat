@@ -1,9 +1,5 @@
 FROM mlikiowa/napcat-docker:latest
 
-# 安装 cron（用于定时消息）
-RUN apt-get update && apt-get install -y --no-install-recommends cron && \
-    rm -rf /var/lib/apt/lists/*
-
 # 预解压 NapCat，避免运行时 unzip 跟 volume 软链接冲突
 RUN unzip -o /app/NapCat.Shell.zip -d /app/NapCat.Shell/ && \
     cp -r /app/NapCat.Shell/* /app/ && \
