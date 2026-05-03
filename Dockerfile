@@ -1,30 +1,15 @@
-FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim
+FROM mlikiowa/napcat-docker:latest
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl python3 unzip libicu72 bsdutils && \
-    rm -rf /var/lib/apt/lists/*
+# 预解压 NapCat（避免运行时 volume 冲突）
+RUN unzip -o /app/NapCat.Shell.zip -d /app/NapCat.Shell/ && \
+    cp -r /app/NapCat.Shell/* /app/ && \
+    rm -rf /app/NapCat.Shell/ && \
+    mkdir -p /app/napcat/config /app/.config/QQ
 
-# 下载 Lagrange.OneBot 自包含构建 (net9.0, linux-x64)
-ARG LAGRANGE_TAG=nightly
-RUN mkdir -p /app/bin /app/data /tmp/lagrange-extract && \
-    curl -fsSL --retry 3 -o /tmp/lagrange.tar.gz \
-        "https://github.com/LagrangeDev/Lagrange.Core/releases/download/${LAGRANGE_TAG}/Lagrange.OneBot_linux-x64_net9.0_SelfContained.tar.gz" && \
-    tar xzf /tmp/lagrange.tar.gz -C /tmp/lagrange-extract/ && \
-    PUBLISH_DIR=$(dirname $(find /tmp/lagrange-extract -name Lagrange.OneBot -type f)) && \
-    mv "$PUBLISH_DIR"/* /app/bin/ && \
-    rm -rf /tmp/lagrange.tar.gz /tmp/lagrange-extract
-
-WORKDIR /app/data
-
-COPY appsettings.json /app/templates/appsettings.json
 COPY scripts/ /app/scripts/
 RUN chmod +x /app/scripts/*.sh
 
 COPY docker-init.sh /docker-init.sh
 RUN chmod +x /docker-init.sh
-
-ENV RUNNING_IN_DOCKER=true
-ENV DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION=1
-ENV TERM=xterm
 
 ENTRYPOINT ["bash", "/docker-init.sh"]

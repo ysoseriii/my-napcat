@@ -1,0 +1,21 @@
+name: 每日自动启动 NapCat 发消息
+
+on:
+  schedule:
+    # UTC 21:55 = UTC+8 5:55（在 6:00 窗口前 5 分钟启动）
+    - cron: "55 21 * * *"
+  workflow_dispatch:  # 手动触发用于测试
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: 启动 Fly 机器
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl machine start --app my-napcat --all
+          echo "机器已启动，等待自动发送和关机..."
