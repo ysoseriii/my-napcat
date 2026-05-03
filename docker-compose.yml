@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  napcat:
+    image: napcat:latest
+    container_name: napcat
+    environment:
+      - NAPCAT_UID=${NAPCAT_UID:-0}
+      - NAPCAT_GID=${NAPCAT_GID:-0}
+      - ACCOUNT=${ACCOUNT:-}        # 快速登录 QQ 号
+      - WEBUI_TOKEN=${WEBUI_TOKEN:-}
+      - MODE=${MODE:-}              # ws / astrbot / koishi
+    ports:
+      - "6099:6099"   # WebUI
+      - "3001:3001"   # WebSocket
+    volumes:
+      - ./napcat_data/config:/app/napcat/config
+      - ./napcat_data/plugins:/app/napcat/plugins
+      - ./QQ_data:/app/.config/QQ
+    restart: unless-stopped
