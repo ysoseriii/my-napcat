@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 下载 Lagrange.OneBot 自包含构建 (net9.0, linux-x64)
 ARG LAGRANGE_TAG=nightly
-RUN mkdir -p /app/bin /app/data && \
+RUN mkdir -p /app/bin /app/data /tmp/lagrange-extract && \
     curl -fsSL --retry 3 -o /tmp/lagrange.tar.gz \
         "https://github.com/LagrangeDev/Lagrange.Core/releases/download/${LAGRANGE_TAG}/Lagrange.OneBot_linux-x64_net9.0_SelfContained.tar.gz" && \
     tar xzf /tmp/lagrange.tar.gz -C /tmp/lagrange-extract/ && \
