@@ -14,7 +14,9 @@ fi
 echo "[init] 启动 Lagrange.OneBot (Watch 协议)..."
 
 # 启动 Lagrange（前台阻塞，日志包含二维码）
-/app/bin/Lagrange.OneBot &
+# 用 script 创建伪终端（.NET 需要终端环境才能初始化 Console）
+script -qfc "/app/bin/Lagrange.OneBot" /dev/null &
+
 LAGRANGE_PID=$!
 echo "[init] Lagrange PID: $LAGRANGE_PID"
 

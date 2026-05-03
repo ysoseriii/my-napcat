@@ -1,7 +1,7 @@
-FROM debian:bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl python3 unzip libicu72 && \
+    ca-certificates curl python3 unzip libicu72 bsdutils && \
     rm -rf /var/lib/apt/lists/*
 
 # 下载 Lagrange.OneBot 自包含构建 (net9.0, linux-x64)
