@@ -2,8 +2,9 @@ app = "my-napcat"
 primary_region = "sin"
 
 [env]
-  ACCOUNT = "3059754914"
+  ACCOUNT = "1215207734"
   WEBUI_TOKEN = "Base64@d3p4"
+  MODE = "ws"
 
 [http_service]
   internal_port = 6099
