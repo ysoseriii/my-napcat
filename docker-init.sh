@@ -1,33 +1,33 @@
 #!/bin/bash
-# init: volume merge + 定时调度 + 测试消息
+# Lagrange.OneBot 启动脚本
 set -e
 
-mkdir -p /data/config /data/QQ
-
-# 首次运行：迁预置 config 到 volume
-if [ ! -f /data/config/napcat.json ]; then
-    cp -a /app/napcat/config/. /data/config/ 2>/dev/null || true
+# 首次运行：复制模板配置到持久化 volume
+if [ ! -f /app/data/appsettings.json ]; then
+    cp /app/templates/appsettings.json /app/data/appsettings.json
+    echo "[init] 首次运行，已写入配置文件"
 fi
 
-# 清理旧 onebot 配置，让 MODE 模板生效
-rm -f /data/config/onebot11_*.json
+# 确保 config 在正确位置（每次从 volume 读）
+# Lagrange 从 WORKDIR 读 appsettings.json
 
-# 软链接
-rm -rf /app/napcat/config
-ln -sfn /data/config /app/napcat/config
-mkdir -p /app/.config
-rm -rf /app/.config/QQ
-ln -sfn /data/QQ /app/.config/QQ
+echo "[init] 启动 Lagrange.OneBot (Watch 协议)..."
 
-# 启动后台定时调度器
-bash /scripts/daily-scheduler.sh &
-echo "[init] 调度器已启动 (PID $!)"
+# 启动 Lagrange（前台阻塞，日志包含二维码）
+/app/bin/Lagrange.OneBot &
+LAGRANGE_PID=$!
+echo "[init] Lagrange PID: $LAGRANGE_PID"
 
-# 延迟发送测试消息（等 QQ 登录，~120s）
+# 启动定时调度器
+bash /app/scripts/daily-scheduler.sh &
+echo "[init] 调度器 PID: $!"
+
+# 等 QQ 登录后发测试消息
 (
     sleep 120
-    TARGET_QQ=1308357113 /scripts/send-msg.sh "此条为测试消息
+    TARGET_QQ=1308357113 /app/scripts/send-msg.sh "此条为测试消息
 道爷我成啦"
 ) &
 
-exec bash /app/entrypoint.sh "$@"
+# 等待 Lagrange 主进程
+wait $LAGRANGE_PID

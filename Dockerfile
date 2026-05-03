@@ -1,19 +1,27 @@
-FROM mlikiowa/napcat-docker:latest
+FROM debian:bookworm-slim
 
-# 预解压 NapCat，避免运行时 unzip 跟 volume 软链接冲突
-RUN unzip -o /app/NapCat.Shell.zip -d /app/NapCat.Shell/ && \
-    cp -r /app/NapCat.Shell/* /app/ && \
-    rm -rf /app/NapCat.Shell/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl python3 unzip && \
+    rm -rf /var/lib/apt/lists/*
 
-# 空目录（entrypoint 会检测并跳过）
-RUN mkdir -p /app/napcat/config /app/.config/QQ
+# Lagrange.OneBot 自包含构建 (net9.0, linux-x64)
+ARG LAGRANGE_TAG=nightly
+ADD https://github.com/LagrangeDev/Lagrange.Core/releases/download/${LAGRANGE_TAG}/Lagrange.OneBot_linux-x64_net9.0_SelfContained.tar.gz /tmp/lagrange.tar.gz
 
-# 定时消息脚本
-COPY scripts/ /scripts/
-RUN chmod +x /scripts/*.sh
+RUN mkdir -p /app/bin /app/data && \
+    tar xzf /tmp/lagrange.tar.gz -C /app/bin && \
+    chmod +x /app/bin/Lagrange.OneBot && \
+    rm /tmp/lagrange.tar.gz
 
-# init 脚本 (volume mount 后运行)
+WORKDIR /app/data
+
+COPY appsettings.json /app/templates/appsettings.json
+COPY scripts/ /app/scripts/
+RUN chmod +x /app/scripts/*.sh
+
 COPY docker-init.sh /docker-init.sh
 RUN chmod +x /docker-init.sh
+
+ENV RUNNING_IN_DOCKER=true
 
 ENTRYPOINT ["bash", "/docker-init.sh"]

@@ -4,8 +4,8 @@
 
 EMOJI_DICT='🔥 🌿 💧 😋'
 TARGET_QQ="${TARGET_QQ:-1308357113}"
-SEND_SCRIPT="/scripts/send-msg.sh"
-LOG_FILE="/data/daily-send.log"
+SEND_SCRIPT="/app/scripts/send-msg.sh"
+LOG_FILE="/app/data/daily-send.log"
 
 while true; do
     # 随机选 UTC+8 的小时 (6/7/8) + 分钟 + ±1~3min 偏移

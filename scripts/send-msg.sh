@@ -15,7 +15,7 @@ fi
 [ -z "$MESSAGE" ] && { echo "用法: $0 消息"; exit 1; }
 
 for i in $(seq 1 30); do
-    RESP=$(python3 /scripts/ws_send.py "$TARGET_QQ" "$MESSAGE" 2>&1)
+    RESP=$(python3 /app/scripts/ws_send.py "$TARGET_QQ" "$MESSAGE" 2>&1)
     echo "[$(date '+%H:%M:%S')] 尝试 $i/30: $RESP"
 
     if echo "$RESP" | grep -qE '"status":"ok"|"retcode":0'; then

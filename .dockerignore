@@ -1,11 +1,24 @@
+# 旧 NapCat Windows 文件（不再需要）
 QQ.exe
 7z.dll
 7z.exe
 NapCatInstaller.exe
 NapCat.44498.Shell/
 bootmain/
-docker-compose.yml
+NapCat.Shell.zip
+
+# Docker
 Dockerfile
+.dockerignore
+docker-compose.yml
 build-and-push.sh
+
+# 数据目录
+napcat_data/
+QQ_data/
+
+# 其他
 *.log
 *.env
+.git
+.gitignore
