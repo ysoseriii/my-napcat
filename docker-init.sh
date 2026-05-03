@@ -14,7 +14,7 @@ fi
 echo "[init] 启动 Lagrange.OneBot (Watch 协议)..."
 
 # 启动 Lagrange（前台阻塞，日志包含二维码）
-/app/bin/Lagrange.OneBot &
+/app/Lagrange.OneBot &
 LAGRANGE_PID=$!
 echo "[init] Lagrange PID: $LAGRANGE_PID"
 
