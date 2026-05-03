@@ -24,5 +24,7 @@ COPY docker-init.sh /docker-init.sh
 RUN chmod +x /docker-init.sh
 
 ENV RUNNING_IN_DOCKER=true
+ENV DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION=1
+ENV TERM=xterm
 
 ENTRYPOINT ["bash", "/docker-init.sh"]
