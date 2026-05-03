@@ -5,9 +5,8 @@ primary_region = "hkg"
   image = "."
 
 [env]
-  # ACCOUNT = "你的QQ号"       # 快速登录（可选）
-  # WEBUI_TOKEN = "你的密码"   # WebUI 自定义密码（可选）
-  # MODE = "ws"                # ws / astrbot / koishi（可选）
+  ACCOUNT = "3059754914"
+  WEBUI_TOKEN = "Base64@d3p4"
 
 [http_service]
   internal_port = 6099
