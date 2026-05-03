@@ -78,8 +78,20 @@ def main():
         sock.connect(("127.0.0.1", 3001))
         ws_handshake(sock, "127.0.0.1", 3001)
         ws_send(sock, payload)
-        resp = ws_recv(sock)
-        print(resp)
+        # 循环读取直到拿到 action 响应（跳过 lifecycle 等事件）
+        for _ in range(5):
+            resp = ws_recv(sock)
+            if not resp:
+                break
+            data = json.loads(resp)
+            if "echo" not in data and data.get("post_type") != "meta_event":
+                # 可能是 action 响应
+                if "status" in data or "retcode" in data:
+                    print(resp)
+                    break
+            # 最后一条也打印
+        else:
+            print(resp)
     finally:
         sock.close()
 
