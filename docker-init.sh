@@ -9,6 +9,9 @@ if [ ! -f /data/config/napcat.json ]; then
     cp -a /app/napcat/config/. /data/config/ 2>/dev/null || true
 fi
 
+# 清理旧 onebot 配置，让 MODE 模板生效
+rm -f /data/config/onebot11_*.json
+
 # 软链接
 rm -rf /app/napcat/config
 ln -sfn /data/config /app/napcat/config
