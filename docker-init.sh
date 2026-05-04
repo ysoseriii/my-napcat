@@ -1,5 +1,5 @@
 #!/bin/bash
-# 按需模式：启动 NapCat → 等 WS 就绪 → 随机延时 → 发消息 → 退出
+# 按需模式 v2：前台跑 entrypoint，后台发消息，发送后自毁
 set -e
 
 EMOJI_DICT='🔥 🌿 💧 😋'
@@ -17,46 +17,39 @@ mkdir -p /app/.config
 rm -rf /app/.config/QQ
 ln -sfn /data/QQ /app/.config/QQ
 
-echo "[init] 启动 NapCat..."
-bash /app/entrypoint.sh &
-NAPCAT_PID=$!
-
-# 等 WebSocket 就绪（最多 5 分钟）
-echo "[init] 等待 QQ 上线..."
-for i in $(seq 1 60); do
-    sleep 5
-    python3 -c "
-import socket
-s=socket.socket();s.settimeout(2)
-try:
- s.connect(('127.0.0.1',3001));s.close();print('OK')
-except: pass
-" 2>/dev/null | grep -q OK && { echo "[init] WS 就绪 (${i}x5s)"; break; }
-    echo "[init] 等待... ($i/60)"
-done
-
-# 随机延时：5-185 分钟窗口（6:00 ~ 9:00 UTC+8）
-# 测试模式：设置 TEST_MODE=1 则只等 10 秒
+# 测试模式：只等 10 秒
 if [ "${TEST_MODE:-0}" = "1" ]; then
-    OFFSET=10
+    WAIT=10
 else
-    OFFSET=$((300 + RANDOM % 10800 ))
+    # 随机延时: 5-185 分钟 (6:00~9:00 UTC+8)
+    WAIT=$((300 + RANDOM % 10800))
     JITTER=$(( (RANDOM % 7) - 3 ))
     [ $JITTER -eq 0 ] && JITTER=1
-    OFFSET=$((OFFSET + JITTER * 60))
-    [ $OFFSET -lt 60 ] && OFFSET=60
+    WAIT=$((WAIT + JITTER * 60))
+    [ $WAIT -lt 60 ] && WAIT=60
 fi
 
-echo "[init] ${OFFSET}秒后发送..."
-sleep "$OFFSET"
+echo "[init] ${WAIT}秒后发送，启动 NapCat..."
 
-# 随机 emoji
-read -ra ITEMS <<< "$EMOJI_DICT"
-EMOJI="${ITEMS[$((RANDOM % ${#ITEMS[@]}))]}"
-echo "[init] 发送: $EMOJI → $TARGET_QQ"
-TARGET_QQ="$TARGET_QQ" /app/scripts/send-msg.sh "$EMOJI"
+# 后台：等 QQ 就绪 → 延时 → 发消息 → 杀进程
+(
+    # 等 QQ 完全就绪（最多 6 分钟）
+    for i in $(seq 1 72); do
+        sleep 5
+        python3 -c "import socket;s=socket.socket();s.settimeout(2);s.connect(('127.0.0.1',3001));s.close();print('OK')" 2>/dev/null | grep -q OK && break
+    done
 
-echo "[init] 完成，30秒后关机"
-sleep 30
-kill $NAPCAT_PID 2>/dev/null || true
-exit 0
+    sleep "$WAIT"
+
+    read -ra ITEMS <<< "$EMOJI_DICT"
+    EMOJI="${ITEMS[$((RANDOM % ${#ITEMS[@]}))]}"
+    echo "[send] $EMOJI → $TARGET_QQ"
+    TARGET_QQ="$TARGET_QQ" /app/scripts/send-msg.sh "$EMOJI"
+
+    sleep 30
+    echo "[send] 关机"
+    kill 1
+) &
+
+# 前台：官方 entrypoint
+exec bash /app/entrypoint.sh "$@"
