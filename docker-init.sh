@@ -48,7 +48,11 @@ echo "[init] ${WAIT}秒后发送，启动 NapCat..."
 
     sleep 30
     echo "[send] 关机"
-    kill 1
+    # 杀掉所有 QQ 进程 → entrypoint 退出 → 机器停止
+    pkill -9 qq 2>/dev/null || true
+    sleep 5
+    # 兜底：如果机器还在，杀 entrypoint
+    pkill -9 entrypoint 2>/dev/null || true
 ) &
 
 # 前台：官方 entrypoint
