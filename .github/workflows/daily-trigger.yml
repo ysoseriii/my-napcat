@@ -17,10 +17,13 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          MACHINES=$(flyctl m list --app my-napcat --json | python3 -c "import json,sys; print(' '.join(m['id'] for m in json.load(sys.stdin)))")
+          # 先尝试启动已有机器（快），没有则 deploy（首次）
+          MACHINES=$(flyctl m list --app my-napcat --json | python3 -c "import json,sys; print(' '.join(m['id'] for m in json.load(sys.stdin)))" 2>/dev/null)
           if [ -n "$MACHINES" ]; then
+            echo "启动已有机器: $MACHINES"
             flyctl m start $MACHINES --app my-napcat
           else
-            echo "没有机器，跳过启动"
+            echo "无机器，执行 deploy..."
+            flyctl deploy --app my-napcat --remote-only
           fi
-          echo "机器已启动，等待自动发送和关机..."
+          echo "机器已触发，等待自动发送和关机..."
