@@ -36,11 +36,16 @@ except: pass
 done
 
 # 随机延时：5-185 分钟窗口（6:00 ~ 9:00 UTC+8）
-OFFSET=$((300 + RANDOM % 10800 ))
-JITTER=$(( (RANDOM % 7) - 3 ))
-[ $JITTER -eq 0 ] && JITTER=1
-OFFSET=$((OFFSET + JITTER * 60))
-[ $OFFSET -lt 60 ] && OFFSET=60
+# 测试模式：设置 TEST_MODE=1 则只等 10 秒
+if [ "${TEST_MODE:-0}" = "1" ]; then
+    OFFSET=10
+else
+    OFFSET=$((300 + RANDOM % 10800 ))
+    JITTER=$(( (RANDOM % 7) - 3 ))
+    [ $JITTER -eq 0 ] && JITTER=1
+    OFFSET=$((OFFSET + JITTER * 60))
+    [ $OFFSET -lt 60 ] && OFFSET=60
+fi
 
 echo "[init] ${OFFSET}秒后发送..."
 sleep "$OFFSET"
