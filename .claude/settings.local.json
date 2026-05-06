@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh run *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(j['name'], j['databaseId'], j['conclusion']\\) for j in d['jobs']]\")",
+      "Bash(export PATH=\"$PATH:/c/Users/aaron/AppData/Local/Microsoft/WinGet/Packages/Fly-io.flyctl_Microsoft.Winget.Source_8wekyb3d8bbwe\")",
+      "Bash(flyctl machine *)",
+      "Bash(python3 -c \"import json,sys; ms=json.load\\(sys.stdin\\); print\\(f'{len\\(ms\\)} machines:'\\); [print\\(f'  {m[\\\\\"id\\\\\"]} {m[\\\\\"state\\\\\"]}'\\) for m in ms]\")",
+      "Bash(flyctl logs *)"
+    ]
+  }
+}

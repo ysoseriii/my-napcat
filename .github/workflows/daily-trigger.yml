@@ -2,14 +2,14 @@ name: 每日自动启动 NapCat 发消息
 
 on:
   schedule:
-    # UTC 21:55 = UTC+8 5:55（在 6:00 窗口前 5 分钟启动）
+    # UTC 21:55 = UTC+8 5:55
     - cron: "55 21 * * *"
-  workflow_dispatch:  # 手动触发用于测试
+  workflow_dispatch:
 
 jobs:
   trigger:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
@@ -18,13 +18,20 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          # 先尝试启动已有机器（快），没有则 deploy（首次）
-          MACHINES=$(flyctl m list --app my-napcat --json | python3 -c "import json,sys; print(' '.join(m['id'] for m in json.load(sys.stdin)))" 2>/dev/null)
+          MACHINES_JSON=$(flyctl m list --app my-napcat --json 2>/dev/null)
+          MACHINES=$(echo "$MACHINES_JSON" | python3 -c "import json,sys; print(' '.join(m['id'] for m in json.load(sys.stdin)))" 2>/dev/null)
+
           if [ -n "$MACHINES" ]; then
-            echo "启动已有机器: $MACHINES"
-            flyctl m start $MACHINES --app my-napcat
+            # 只启动处于 stopped 状态的机器
+            STOPPED=$(echo "$MACHINES_JSON" | python3 -c "import json,sys; print(' '.join(m['id'] for m in json.load(sys.stdin) if m['state']=='stopped'))")
+            if [ -n "$STOPPED" ]; then
+              echo "启动已停止的机器: $STOPPED"
+              flyctl m start $STOPPED --app my-napcat
+            else
+              echo "机器已在运行中，跳过启动"
+            fi
           else
             echo "无机器，执行 deploy..."
             flyctl deploy --app my-napcat --remote-only
           fi
-          echo "机器已触发，等待自动发送和关机..."
+          echo "触发完成"
