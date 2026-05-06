@@ -7,9 +7,9 @@ RUN unzip -o /app/NapCat.Shell.zip -d /app/NapCat.Shell/ && \
     mkdir -p /app/napcat/config /app/.config/QQ
 
 COPY scripts/ /app/scripts/
-RUN chmod +x /app/scripts/*.sh
+RUN chmod +x /app/scripts/*.sh && sed -i 's/\r$//' /app/scripts/*.sh /app/scripts/*.py
 
 COPY docker-init.sh /docker-init.sh
-RUN chmod +x /docker-init.sh
+RUN chmod +x /docker-init.sh && sed -i 's/\r$//' /docker-init.sh
 
 ENTRYPOINT ["bash", "/docker-init.sh"]
