@@ -21,12 +21,12 @@ ln -sfn /data/QQ /app/.config/QQ
 if [ "${TEST_MODE:-0}" = "1" ]; then
     WAIT=10
 else
-    # 随机延时: 5-185 分钟 (6:00~9:00 UTC+8)
-    WAIT=$((300 + RANDOM % 10800))
+    # 随机延时: 0-123 分钟 (对应 6:00~8:03 UTC+8)
+    WAIT=$(( RANDOM % 7380 ))
     JITTER=$(( (RANDOM % 7) - 3 ))
     [ $JITTER -eq 0 ] && JITTER=1
     WAIT=$((WAIT + JITTER * 60))
-    [ $WAIT -lt 60 ] && WAIT=60
+    [ $WAIT -lt 10 ] && WAIT=10
 fi
 
 echo "[init] ${WAIT}秒后发送，启动 NapCat..."

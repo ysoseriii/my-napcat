@@ -6,7 +6,12 @@
       "Bash(export PATH=\"$PATH:/c/Users/aaron/AppData/Local/Microsoft/WinGet/Packages/Fly-io.flyctl_Microsoft.Winget.Source_8wekyb3d8bbwe\")",
       "Bash(flyctl machine *)",
       "Bash(python3 -c \"import json,sys; ms=json.load\\(sys.stdin\\); print\\(f'{len\\(ms\\)} machines:'\\); [print\\(f'  {m[\\\\\"id\\\\\"]} {m[\\\\\"state\\\\\"]}'\\) for m in ms]\")",
-      "Bash(flyctl logs *)"
+      "Bash(flyctl logs *)",
+      "Bash(flyctl ssh *)",
+      "Bash(gh workflow *)",
+      "Bash(flyctl secrets *)",
+      "Bash(python3 -c \"import json,sys; [print\\(f'{m[\\\\\"id\\\\\"]} {m[\\\\\"state\\\\\"]}'\\) for m in json.load\\(sys.stdin\\)]\")",
+      "Bash(curl -sL --max-time 10 \"https://raw.githubusercontent.com/ysoseriii/my-napcat/master/.github/workflows/daily-trigger.yml\")"
     ]
   }
 }
